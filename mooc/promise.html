@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>promise</title>
+</head>
+<body>
+    <script>
+        function createPromise(val) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(val)
+                }, 1000)
+            })
+        }
+
+        (async function() {
+            const p1 = createPromise(100)
+            const p2 = createPromise(200)
+            const p3 = createPromise(300)
+
+            // const res1 = await p1;
+            // console.log('res1', res1);
+            // const res2 = await p2;
+            // console.log('res2', res2);
+            // const res3 = await p3;
+            // console.log('res2', res3);
+
+            // Promise.all([p1, p2, p3]).then(res => {
+            //     console.log(res)
+            // })
+
+            for await (let res of [p1, p2, p3]) {
+                console.log(res)
+            }
+        })()
+    </script>
+</body>
+</html>

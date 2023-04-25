@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>代理沙箱基本实现</title>
+</head>
+<body>
+    <div>
+        <h1>Proxy sandbox</h1>
+    </div>
+    <script>
+       /** 修改window对象的属性和方法 **/
+       function updateWindow(prop, value, isDelete) {
+        if(value === undefined || isDelete) {
+            delete window[prop]
+        } else {
+            window[prop] = value
+        }
+       }
+
+       /** 代理沙箱实现 **/
+       class ProxySandbox {
+        constructor(name) {
+            // 沙箱名称
+            this.name = name
+            // 沙箱代理
+            this.proxy = null
+            // 沙箱内的全局上下文
+            const sandboxWindow = Object.create(null)
+            // 记录沙箱内新增加的属性
+            this.addedPropsMap = new Map()
+            // 记录沙箱呢更新的属性
+            this.updatedPropsMap = new Map()
+            // 记录沙箱内所有新增和更新过的属性
+            this.allChangedPropsMap = new Map()
+
+            const {addedPropsMap, updatedPropsMap, allChangedPropsMap} = this;
+
+            // proxy 对象创建
+            const proxy = new Proxy(sandboxWindow, {
+                set(target, prop, value) {
+                    if(!window.hasOwnProperty(prop)) {
+                        // 如果window对象上没有这个属性,则将这个属性添加到沙箱中并记录
+                        addedPropsMap.set(prop, value)
+                    } else if (!updatedPropsMap.has(prop)) {
+                        // 更新的对象, 记录window对象上该属性的初始值
+                        const orgVal = window[prop]
+                        updatedPropsMap.set(prop, orgVal)
+                    }
+                    // 记录所有变更的值
+                    allChangedPropsMap.set(prop, value)
+                    // 更新window对象的属性
+                    updateWindow(prop, value)
+                    return true
+                },
+                get(target, prop) {
+                    return window[prop]
+                },
+            })
+            this.proxy = proxy
+        }
+        
+        // 激活沙箱
+        activeSandbox () {
+            // 根据当前记录变更的属性，更行window读箱
+            this.allChangedPropsMap.forEach((v, p) => updateWindow(p, v))
+        }
+
+        // 关闭沙箱
+        inactiveSandbox() {
+            // 还原沙箱激活期间变更的属性
+            this.updatedPropsMap.forEach((v, p) => updateWindow(p, v))
+            // 删除沙箱激活期间新增的属性
+            this.addedPropsMap.forEach((_, p) => updateWindow(p, undefined, true))
+        }
+       }
+
+       // 代理沙箱测试
+       const sandbox = new ProxySandbox('proxySandbox')
+       const proxySandboxContext = sandbox.proxy
+       proxySandboxContext.dog = '旺财';
+       console.log('激活沙箱:', window.dog, proxySandboxContext.dog)
+
+       // 关闭沙箱
+       sandbox.inactiveSandbox()
+       console.log('关闭沙箱:', window.dog, proxySandboxContext.dog)
+
+       // 重启激活沙箱
+       sandbox.activeSandbox()
+       console.log('重新激活沙箱:', window.dog, proxySandboxContext.dog)
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>链表</title>
+</head>
+
+<body>
+    <h1>链表知识</h1>
+    <script>
+        function createLinkList(arr) {
+            if (!arr || arr.length === 0) return null
+            let curNode = {
+                value: arr[arr.length - 1],
+                next: null
+            }
+            for (let i = arr.length - 2; i >= 0; i--) {
+                curNode = {
+                    value: arr[i],
+                    next: curNode
+                }
+            }
+            return curNode
+        }
+
+        function reverseLink(linkNode) {
+            let prevNode = null
+            let curNode = null // head指针
+            let nextNode = linkNode // 从第一个节点开始
+            // 遍历链表
+            while (nextNode) {
+                if (curNode && !prevNode) {
+                    // 第一个节点
+                    delete curNode.next
+                }
+                if (prevNode && curNode) {
+                    // 反转链表指针指向
+                    curNode.next = prevNode
+                }
+
+                // 移动指针
+                prevNode = curNode
+                curNode = nextNode
+                nextNode = nextNode.next
+            }
+
+            // 最后一个元素
+            curNode.next = prevNode
+
+            return curNode
+        }
+
+        const arr = [11, 22, 33, 44, 55]
+        const link = createLinkList(arr);
+        console.log('link:', link);
+        const res = reverseLink(link);
+        console.log('反转链表:', res);
+
+        // 创建节点的构造函数
+        class Node {
+            constructor(ele) {
+                this.value = ele;
+                this.next = null;
+            }
+        }
+
+        class LinkList {
+            constructor() {
+                this.head = null; // 头指针
+                this.length = 0; // 链表长度
+            }
+
+            // 向链表尾部添加一个节点
+            append(el) {
+                const node = new Node(ele)
+                let curNode = null
+                if(this.head === null) {
+                    this.head = node
+                } else {
+                    curNode = this.head
+                    while(curNode) {
+                        curNode = curNode.next
+                    }
+                    curNode.next = node
+                }
+                this.length++
+                return curNode
+            }
+
+            // 删除指定位置的节点
+            removeAt(position) {
+                // 检验边界条件
+                if(position > -1 && position < this.length) {
+                    let curNode = this.head
+                    let prevNode = null
+                    let index = 0
+                    while(index !== position) {
+                        prevNode = curNode
+                        curNode = curNode.next
+                        inde++
+                    }
+                    prevNode.next = curNode.next
+                    this.length--
+                    return true
+                } else {
+                    return false
+                }
+            }
+
+            // 删除指定元素
+            remove(ele) {
+                const node = new Node(ele)
+                let curNode = this.head
+                let prevNode = null
+                while(curNode !== node) {
+                    prevNode = curNode
+                    curNode = curNode.next
+                }
+                prevNode.next = curNode.next
+                this.length--
+                return true
+            }
+
+            // 在指定位置插入元素
+            insert(ele, position) {
+                if(position > - 1 && position < this.length) {
+                    const node = new Node(ele)
+                    let curNode = this.head
+                    let prevNode = null
+                    index = 0 
+                    while(index !== position) {
+                        prevNode = curNode
+                        curNode = curNode.next
+                    }
+                    prevNode.next = node
+                    node.next = curNode
+                    this.length++
+                    return true
+                } else {
+                    return false
+                }
+            }
+
+            // 返回节点所在的位置
+            indexOf(ele) {
+                const node = new Node(ele)
+                let curNode = this.head
+                let index = 0
+                while(node !== curNode) {
+                    curNode = curNode.next
+                    index++
+                }
+                return index
+            }
+
+            // 转化为字符串
+            toString() {
+                let curNode = this.head
+                let str = ''
+                while(curNode) {
+                    str = `${curNode.value}${curNode.next ? 'n' : ''}`
+                    curNode = curNode.next
+                }
+                return str
+            }
+
+            // 判断是否为空链表
+            isEmpty() {
+                return this.length === 0 ? true : false
+            }
+
+            // 获取链表长度
+            size() {
+                return this.length
+            }
+
+            // 获取链表的第一个元素
+            getHead() {
+                return this.head
+            }
+        }
+    </script>
+</body>
+
+</html>

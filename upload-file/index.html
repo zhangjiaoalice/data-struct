@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件上传对象</title>
+</head>
+<body>
+    <div>
+        <h2>访问文件</h2>
+        <input type="file" onchange="onFileChange(this.files)">
+        <br />
+        <br />
+        <input type="file" multiple id="file_mutil">
+
+        <button>文件分片</button>
+    </div>
+    <div>
+        <h2>使用URL对象-标识File对象</h2>
+        <input type="file" multiple id="input_tag" accept="application/dicom"  style="display: none;" onchange="handelUrlFiles(this.files)">
+        <a href="#" id="a_tag">选择文件</a>
+        <div id="file_list">
+            <p>No files selected!</p>
+        </div>
+    </div>
+    <div id="pdf_box">
+        <h2>使用URL对象显示pdf</h2>
+        <input type="file" id="pdf_file" onchange="handelPdfFileChange(this.files)" style="display: none;">
+        <a href="#" id="load_pdf">加载PDF文件</a>
+        <br/>
+        <br />
+    </div>
+    <div id="blob_box">
+        <h2>Blob 对象使用方式</h2>
+        <input type="file" id="blob_file" multiple onchange="getFileList(this.files)" style="display: none;">
+        <a href="#" id="load_bolb">上传文件(blob)</a>
+        <br/>
+        <br/>
+    </div>
+    <script src="./js/input_select_file.js"></script>
+    <!-- <script src="./js/use_url_obj.js"></script>
+    <script src="./js/show_pdf.js"></script>
+    <script src="./js/blob_use.js"></script> -->
+</body>
+</html>

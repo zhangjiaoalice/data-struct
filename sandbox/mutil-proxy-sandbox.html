@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基于 Proxy 多实例沙箱的实现</title>
+</head>
+<body>
+    <h1>Proxy Multipal Sandbox</h1>
+    <script>
+        class MultipalProxySandbox {
+            constructor(name, context = {}) {
+                this.name = name
+                this.context = context
+                const fakeWindow = Object.create({})
+                this.proxy = null
+                this.sandboxRunning = true
+                const { sandboxRunning } = this
+                const proxy = new Proxy(fakeWindow, {
+                    get(target, prop) {
+                        // 优先使用共享上下文
+                        if(Object.keys(context).includes(prop)) {
+                            return context[prop]
+                        }
+                        return target[prop]
+                    },
+                    set(target, prop, value) {
+                        if(sandboxRunning) {
+                            if(Object.keys(context).includes(prop)) {
+                                // 更新共享上下文
+                                context[prop] = value
+                            }
+                            target[prop] = value
+                        }
+                    }
+                })
+                this.proxy = proxy
+            }
+
+            /** 激活沙箱 **/
+            activeSandbox() {
+                this.sandboxRunning = true
+            }
+
+            /** 关闭沙箱 **/
+            inactiveSandbox() {
+                this.sandboxRunning = false
+            }
+        }
+
+        // 共享上下文
+        const context = {document: window.document}
+
+        // 多实例沙箱测试
+        const sandbox1 = new MultipalProxySandbox('沙箱1', context)
+        sandbox1.activeSandbox();
+        const sandbox1Context = sandbox1.proxy
+        console.log('sandbox1 共享上下文是否相等:', sandbox1Context.document === window.document); // true
+        sandbox1Context.a = '1'; // 设置代理1的值
+        window.a = 'aaaa'
+        console.log('sandbox1-active', sandbox1Context.a, window.a);
+        sandbox1.inactiveSandbox();
+        sandbox1Context.a = '434'
+        window.a = 'bbb'
+        console.log('sandbox1-inactive', sandbox1Context.a, window.a);
+        
+
+        const sandbox2 = new MultipalProxySandbox('沙箱2', context)
+        const sandbox2Context = sandbox2.proxy
+        // 激活沙箱
+        sandbox2.activeSandbox();
+        sandbox2Context.cat = '喵喵~'
+        window.cat = 'dada~'
+        console.log('sandbox2-active:', sandbox2Context.cat, window.cat);
+        sandbox2.inactiveSandbox();
+        console.log('sandbox2-inactive:', sandbox2Context.cat, window.cat);
+        
+
+    </script>
+</body>
+</html>

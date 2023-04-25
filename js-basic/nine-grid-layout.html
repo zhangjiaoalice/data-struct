@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>九宫格布局</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        html,body{
+            height: 100%;
+        }
+        body {
+            display: grid;
+            place-items: center;
+        }
+        ul {
+            width: 300px;
+            list-style: none;
+            display: flex;
+            flex-flow: wrap;
+        }
+
+        li {
+            display: grid;
+            place-items: center;
+            width: 100px;
+            height: 100px;
+            box-sizing: border-box;
+            border: 2px solid black;
+            /* 使用负边距可以消除边框粗的bug */
+            margin: -2px 0 0 -2px; 
+            cursor: pointer;
+        }
+
+        li:nth-child(3n+1) {
+            /* 取消上负边距 */
+            margin-left: 0;
+        }
+
+        li:first-child, li:nth-child(2), li:nth-child(3) {
+            margin-top: 0;
+        }
+
+        li:hover{
+            color: red;
+            border: 2px solid;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <ul>
+        <li>1️</li>
+        <li>2</li>
+        <li>3</li>
+        <li>4</li>
+        <li>5</li>
+        <li>6</li>
+        <li>7</li>
+        <li>8</li>
+        <li>9</li>
+    </ul>
+</body>
+</html>

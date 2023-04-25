@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数组方法重写</title>
+    <style>
+        .parent {
+            display: grid;
+            /* 垂直方向设置为两列 */
+            grid-template-columns: repeat(2, 1fr); 
+        }
+        .box1-parent {
+            /* 九宫格布局1 */
+            display: grid;
+            grid: repeat(3, 1rf) / repeat(3, 1fr);
+            gap: 3px;
+        }
+
+        .box2-parent {
+            /* 九宫格布局二 */
+            display: table;
+        }
+        .box2-child {
+            display: table-row;
+        }
+        .box2-child-chl {
+            display: table-cell;
+        }
+
+        .grid-center {
+            /* grid 居中 */
+            display: grid;
+            place-items: center;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        const arr = [1, 3, 5, 7, 9];
+        const instrumentations = {}
+        const mdArr = ['includes', 'indexOf', 'lastIndexOf']
+        mdArr.forEach(key => {
+            instrumentations[key] = function(obj, ...args) {
+                console.log('this....', obj)
+                console.log('args....', args)
+
+                return obj[key](...args)
+            }
+        })
+
+        console.log('重写之后的方法：', instrumentations.includes(arr, 3))
+
+    </script>
+</body>
+</html>

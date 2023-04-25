@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>反转单向链表</title>
+</head>
+<body>
+    <div>avvvv</div>
+    <script>
+        function createLinkByArr(arr) {
+            if(!arr || arr.length === 0) return []
+            const len = arr.length
+            let curNode = {
+                value: arr[len - 1],
+                next: null
+            }
+
+            for(let i = len - 2; i >= 0; i--) {
+                curNode = {
+                    value: arr[i],
+                    next: curNode
+                }
+            }
+
+            return curNode
+        }
+
+        function reverseLink (linkNode) {
+            let prevNode = null
+            let curNode = null
+            let nextNode = linkNode
+
+            while(nextNode) {
+                if(curNode && !prevNode) {
+                    delete curNode.next
+                }
+
+                if(curNode && prevNode) {
+                    curNode.next = prevNode
+                }
+
+                prevNode = curNode
+                curNode = nextNode
+                nextNode = nextNode.next
+            }
+
+            curNode.next = prevNode
+            return curNode
+        }
+
+        const linkNode = createLinkByArr([1, 3, 5, 7])
+        console.log('linkNode:', linkNode);
+        const rvLink = reverseLink(linkNode)
+        
+        console.log('reverse link node:', rvLink);
+        
+    </script>
+</body>
+</html>

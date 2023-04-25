@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>最少硬币找零问题</title>
+</head>
+<body>
+    <script>
+        function MinCoinsChange(coins) {
+                // 用于缓存面额和找零数组的键值对
+                const cache = {}
+                this.makeChange = function (amount) {
+                    let me = this
+                    if (!amount) return
+                    if (cache[amount]) {
+                        return cache[amount]
+                    }
+                    let min = []; let newMin = []; let newAmount
+                    for (let i = 0; i < coins.length; i++) {
+                        let coin = coins[i]
+                        newAmount = amount - coin
+                        if (newAmount >= 0) {
+                            newMin = me.makeChange(newAmount)
+                        }
+                        if (newAmount >= 0 && newMin && ( newMin.length < min.length - 1 || !min.length) && (newMin.length || !newAmount)) {
+                            min = [coin].concat(newMin)
+                            console.log('new Min:' + min + 'for' + amount)
+                        }
+                    }
+                    return (cache[amount] = min)
+                }
+            }
+
+            const minCoins = new MinCoinsChange([1, 5, 10, 25])
+            console.log(minCoins.makeChange(36))
+    </script>
+</body>
+</html>

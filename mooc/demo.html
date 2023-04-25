@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo</title>
+</head>
+<body>
+   <div id="box">content</div>
+   <script>
+        const arr = []
+        for(let i = 0; i < 10 * 10000; i++) {
+            arr.push(i)
+        }
+
+        function bind() {
+            // 模拟一个比较大的数据
+            const obj = {
+                str: JSON.stringify(arr), //简单拷贝
+            }
+
+            window.addEventListener('resize', () => {
+                console.log(obj)
+            })
+        }
+   </script> 
+</body>
+</html>

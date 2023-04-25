@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reflect 内置对象</title>
+</head>
+<body>
+    <div>
+        <h2>Reflect 对象</h2>
+    </div>
+    <script type="text/html">
+        // Reflect.apply(target, thisArgument, argumentsList)
+        function fn(a, b) {
+            return a + b
+        }
+
+        const obj = {
+            a: 7,
+            b: 8,
+            fun: fn
+        }
+
+        const fnRes = Reflect.apply(fn, undefined, [2, 3])
+        console.log('fnRes:', fnRes); // 5
+
+        const objFnRes = Reflect.apply(obj.fun, obj, [obj.a, obj.b])
+        console.log('objFnRes:', objFnRes); // 15
+        
+    </script>
+    <script type="text/html">
+        // Reflect.construct(target, argumentsList, [newTrget])
+       const date = Reflect.construct(Date, [1996, 7, 15])
+       console.log('date:', date.getFullYear());
+       
+    </script>
+    <script type="text/html">
+        // Reflect.defineProperty(target, propertyKey, attributes)
+        const obj = {
+            name: '旺财',
+            age: 2,
+        }
+        Reflect.defineProperty(obj, 'name', {
+            writable: false
+        })
+        console.log('origin obj:', obj);
+        obj.name = '花花'
+        console.log('write obj:', obj);
+    </script>
+    <script type="text/html">
+        // Reflect.deleteProperty(target, propertyKey)
+        const obj = {
+            height: 222,
+            width: 50,
+            weight: 44
+        }
+        Reflect.deleteProperty(obj, 'width')
+        console.log("fixed property:", obj);
+    </script>
+    <script type="text/html">
+        // Reflect.get(target, prepertyKey, [reciver])
+        const obj = {x: 1, y: 2}
+        const res = Reflect.get(obj, 'x')
+        console.log('res:', res);
+
+        // 访问的对象时数组时，第二参数是数组的下标
+        const arr = Reflect.get(["name", "age"], 0)
+        console.log('arr:', arr);
+
+        const x = {p: 1}
+        const objs = new Proxy(x, {
+            get(target, key, reciver) {
+                console.log('target:', target);
+                console.log('key:', key);
+                console.log('reciver:', reciver);
+                return key + 'bar'
+            }
+        })
+        x.name="123"
+        console.log("代理对象：", objs.name);
+        const proxyRes = Reflect.get(obj, "foo")
+        console.log("Reflect代理对象：", proxyRes);
+        
+    </script>
+    <script>
+        // Reflect.ownKeys(target)
+        const obj = {
+            p1: 33,
+            p2: 67
+        }
+        const arr = [1, 2, 3]
+        const res1 = Reflect.ownKeys(obj)
+        console.log('res1:', res1); // ['p1', 'p2']
+
+        const res2 = Reflect.ownKeys(arr)
+        console.log("res2:", res2); // ['0', '1', '2', 'length']
+    </script>
+</body>
+</html>

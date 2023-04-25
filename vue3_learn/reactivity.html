@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vue 3 响应式系统设计与实现</title>
+</head>
+
+<body>
+    <div id="root">
+        <h2 id="title">vue 3</h2>
+        <button id="btn">change data</button>
+        <button id="change">更新响应式对象</button>
+    </div>
+    <script type="text/html">
+        // 代码分支切换 => 会产生遗留的副作用函数
+        /** vue3 响应式系统设计与实现 */
+        const data = {
+            ok: false,
+            text: 'hello vue'
+        }
+
+        // 存储副作用函数
+        let activeEffect = null;
+
+        // 注册副作用函数
+        const effect = (fn) => {
+            activeEffect = fn;
+            fn();
+        }
+
+        // 存储副作用的桶（WeakMap）
+        /**
+         * 1. 使用WeakMap 集合存储目标对象和目标对象下属性值对应的副作用函数
+         * 2. key: target
+         * 3. val: 操作目标属性值和副作用函数的映射关系 Map
+         * WeakMap 常用于存储那些只有当key所引用的对象存在时（没有被回收）才有价值的信息
+         * */
+        const bucket = new WeakMap();
+
+
+        /**
+         * 属性值追踪函数
+         * **/
+        const track = (target, key) => {
+            if (!activeEffect) return target[key]
+            let depsMap = bucket.get(target)
+            if (!depsMap) {
+                bucket.set(target, (depsMap = new Map()))
+            }
+            let deps = depsMap.get(key)
+            if (!deps) {
+                depsMap.set(key, (deps = new Set()))
+            }
+            deps.add(activeEffect); // bucket = {"{text: 'hello vue'}": {text: [effect1, effect2 ,..., effectn]}}
+            console.log("depsMap：", depsMap)
+            console.log("deps：", deps)
+            console.log("bucket", bucket)
+            return target[key]
+        }
+
+        /**
+         * 劫持 set 触发副作用函数
+        */
+        const trigger = (target, key) => {
+            const depsMap = bucket.get(target)
+            if(!depsMap) return
+            const effects = depsMap.get(key)
+            effects?.length > 0 && effects.forEach(fn => {
+                fn();
+            });
+        }
+
+        /***
+         * 响应式系统, 劫持data属性的Get/Set操作，存储/执行副作用
+         */
+        const obj = new Proxy(data, {
+            get(target, key) {
+                console.log('触发get:', key)
+                track(target, key)
+            },
+            set(target, key, newVal) {
+                console.log('触发set:', key, newVal)
+                target[key] = newVal
+                trigger(target, key)
+            }
+        })
+
+        const btn = document.querySelector('#btn');
+
+        btn && btn.addEventListener('click', () => {
+
+            effect(() => {
+                console.log('更新之后的text值:', obj.text)
+                document.querySelector('#title').innerHTML = obj.ok ? obj.text : 'not';
+            })
+        })
+
+        document.querySelector('#change').addEventListener('click', () => {
+            effect(() => {
+                obj.text = "更新响应式对象的值"
+                console.log("obj.text:", obj.text);
+            })
+        })
+    </script>
+    <script>
+        /**
+         * 代码分支切换产生遗留副作用的解决方法:
+         * 1. 在每次副作用执行时,把它从所有与之关联的依赖集合(set)中删除
+         * 2. 副作用函数执行完毕之后，会重新建立新的依赖关系，新的依赖集合中不包含遗留的副作用函数
+         */
+        
+        const data = {
+            ok: true,
+            text: 'original text'
+        }
+
+        let activeEffect = null;
+
+        // 接收副作用函数作为参数，遍历副作用函数中的effectFn.deps,该数组的每一项都是一个依赖集合，然后将该副作用函数从依赖集合中删除
+        const cleanUp = (effectFn) => {
+            // 遍历effectFn中的deps 数组
+            for(let i = 0; i < effectFn.deps.length; i++) {
+                // deps 依赖集合， 一个属性值对应一个依赖集合
+                const deps = effectFn.deps[i];
+                // 将 effectFn 从依赖集合中移除
+                deps.delete(effectFn)
+            }
+            // 重置effectFn.deps 数组
+            effectFn.deps.length = 0
+        }
+
+        // 注册副作用函数
+        const effect = (fn) => {
+            const effectFn = () => {
+                cleanUp(effectFn)
+                activeEffect = effectFn;
+                fn()
+            }
+            effectFn.deps = [];
+
+            effectFn(); // 执行副作用函数
+            console.log('activeEffect********:',  Object.prototype.hasOwnProperty(activeEffect))
+        }
+
+        const bucket = new WeakMap();
+
+        // 依赖追踪
+        const track = (target, key) => {
+            if(!activeEffect) return target[key]
+            let depsMap = bucket.get(target);
+            if(!depsMap) {
+                bucket.set(target, (depsMap = new Map()))
+            }
+            let deps = depsMap.get(key);
+            if(!deps) {
+                depsMap.set(key, (deps = new Set()))
+            }
+            // 将当前激活的副作用函数添加到deps集合中
+            deps.add(activeEffect);
+            console.log('依赖集合:', deps)
+            console.log('映射关系map:', depsMap);
+            console.log('bucket桶:', bucket);
+            console.log('当前激活的副作用函数activeEffect:', bucket);
+            // 将deps添加到 activeEffect.deps 数组中
+            activeEffect.deps.push(deps)
+        }
+
+        // 依赖更新
+        const trigger = (target, key) => {
+            // 获取目标属性相关的依赖集合，执行副作用
+            const depsMap = bucket.get(target)
+            if(!depsMap) return 
+            const effects = depsMap.get(key)
+            // 对于set集合，当我们调用forEach 遍历set的过程中，如果某个值已经被遍历过了，但是该值被删除并重新添加到集合中，如果此时的forEach遍历没有结束，那么该值就会被重新访问，导致死循环
+            effects?.length > 0 && effects.forEach(fn => fn())
+        }
+
+        // 代理data对象
+        const proxyObj = new Proxy(data, {
+            get(target, key) {
+                track(target, key);
+                return target[key];
+            },
+            set(target, key, newVal) {
+                target[key] = newVal
+                trigger(target, key);
+            }
+        })
+
+        document.querySelector('#btn').addEventListener('click', () => {
+            effect(() => {
+                document.querySelector('#title').innerHTML = proxyObj.isOk ? proxyObj.text : "not"
+            })
+        })
+
+        
+    </script>
+</body>
+
+</html>

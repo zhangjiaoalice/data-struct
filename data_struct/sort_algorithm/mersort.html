@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>merge sort</title>
+</head>
+<body>
+    <script>
+        function merge(left, right) {
+            console.log('left:', left);
+            console.log('right:', right);
+            let tmp = []
+            while(left.length > 0 && right.length > 0) {
+                if(left[0] < right[0]) {
+                    tmp.push(left.shift())
+                } else {
+                    tmp.push(right.shift())
+                }
+            }
+            console.log('tmp***************:', tmp);
+            return tmp.concat(left, right)
+        }
+        function mergeSort(arr) {
+            if(arr.length === 1) return arr;
+            const mid = Math.floor(arr.length / 2)
+            const left = arr.slice(0, mid)
+            const right = arr.slice(mid)
+            console.log('left list:', left);
+            console.log('right list:', right);
+            return merge(mergeSort(left), mergeSort(right))
+        }
+        const arr = [6, 4, 11, 3, 0, -2, 8]
+        const res = mergeSort(arr)
+        console.log('归并排序：', res)
+    </script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>响应式布局方案</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        #box1 ul {
+            list-style: none;
+            display: grid;
+            grid: auto-flow auto / repeat(auto-fit, minmax(100px, 1fr));
+
+        }
+        #box1 ul li {
+            height: 100px;
+            background-color: red;
+        }
+
+        #box2 ul {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        #box2 ul li {
+            margin: 2px;
+
+            background: red;
+            height: 100px;
+            flex: 1;   /* 可伸展 */
+            flex-basis: 100px;
+        }
+
+        #box3 ul {
+            list-style: none;
+        }
+        #box3 ul::after {
+            content: '';
+            display: block;
+            clear: both;
+        }
+
+        #box3 ul li {
+            width: 100px;
+            height: 100px;
+            background-color: red;
+            float: left;
+            margin: 2px;
+        }
+
+        @media screen and (min-width: 450px) and (max-width: 1200px) {
+
+        }
+    </style>
+</head>
+<body>
+    <div id="box1">
+        <h1>网格布局</h1>
+        <ul>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </div>
+
+    <div id="box2">
+        <h1>弹性布局</h1>
+        <ul>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </div>
+
+    <div id="box3">
+        <h1>左右浮动</h1>
+        <ul>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </div>
+
+    <div id="box4">
+        <h1>媒体查询</h1>
+        <ul>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </div>
+
+    <style>
+        /**
+        * calc(): 可以在不刷新浏览器的情况下，让属性值发生变化
+        * transition: transition-property duration timing-funtcion delay; 
+        * animation: name duration timing-function delay itetation-count(动画应该播放的次数) direction(是否需要重复播放);
+        **/
+        /**
+        * 当数值运算的结果放回的是一个未定义或者去发表示的是值的时候，NaN 就产生了
+        * 0.1 + 0.2 不等于 0.3 是因为在计算过程中发生了两次精度丢失
+        * Array.of() 创建数组的方法，将离散的数据组合为数组元素
+        **/
+    </style>
+</body>
+</html>
